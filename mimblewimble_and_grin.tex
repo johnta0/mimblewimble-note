@@ -1,0 +1,58 @@
+\documentclass{jsarticle}
+\begin{document}
+
+\title{Mimblewimble and Grin（メモ）}
+\author{じょんた}
+\maketitle
+
+
+\section{Introduction}
+\begin{itemize}
+    \item GrinはMimblewimbleを実装するためのプロジェクトの名前
+    \item デフォルトで匿名性を保とうぜ
+    \item トランザクションの数ではなく、ユーザーの数でスケールする。したがって従来のブロックチェーンと比べて容量を節約できる
+    \item 楕円曲線暗号を使う
+    \item asic-resistentというマイニングアルゴリズムがdecentralization をencourageするらしい
+\end{itemize}
+
+\section{Tongue Tying for Everyone}
+
+\subsection{ECCについて簡単に}
+楕円曲線上の点の集合について考える。ある点$H$について、和と積が定義されていて、それらは交換法則と結合法則を満たす。ある数$k$を
+点$H$に掛けた答え$k*H$もまた、楕円曲線上の点の集合に属する。また、実数$k, j$と点$H$の計算には分配法則も成り立つ。
+
+\begin{equation}\label{bunpai}
+    (k+j)*H = k*H + j*H
+\end{equation}
+
+楕円曲線暗号において考えると、十分に大きい数$k$を秘密鍵とすると、それに$H$を掛けた$k*H$は公開鍵に対応するものだと考えられる。暗号をとこうとして$k*H$の値から$k$の値を
+計算することは不可能に近いので（EC上での「割り算」はとてもむずかしい）、秘密鍵が悪意のある第三者に知られることはない。
+
+式(\ref{bunpai})が示すのは、２つの秘密鍵の和から計算された公開鍵は、それぞれの秘密鍵から計算された公開鍵の和に等しいということ。BitcoinのHDウォレット（階層決定ウォレット？）
+やMimblewimbleの実装は、この原理が出発点らしい。（Mimblewimbleのは点を合計するとゼロってやつだと思われる）
+
+\subsection{MimblewimbleでのTransaction}
+Mimblewimbleでのトランザクションの承認は以下の２つの原理によって行われる
+\begin{enumerate}
+    \item input-outputの値がゼロに等しいこと。これだけを確認すればいいので実際のinputとoutputの量は不必要
+    \item 秘密鍵を所有していることの証明：これは他のブロックチェーンと違うのは、直接トランザクションに署名をするわけではない
+\end{enumerate}
+
+\subsection{残高}
+トランザクションの値とは何か。
+
+$v$がトランザクションinputまたはoutputだとすると、$v$の代わりに$v*H$をトランザクションに組み込める。また、それらの値の和についても
+\begin{equation}
+    v_1 + v_2 = v_3 => v_1*H + v_2*H = v_3*H
+\end{equation}
+
+ということが分かる。
+
+\begin{center}
+	commitment = SHA256( (blinding factor) or (data) )
+\end{center}
+
+
+\end{document}
+
+
